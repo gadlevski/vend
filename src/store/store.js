@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-// import productsReducer from '../slices/products';
-import cashReducer from '../slices/cash';
+import productsReducer from '../slices/products';
+import moneyReducer from '../slices/money';
 
 export default configureStore({
     reducer: {
-        // products: productsReducer,
-        cash: cashReducer,
+        products: productsReducer,
+        money: moneyReducer,
     },
 });
