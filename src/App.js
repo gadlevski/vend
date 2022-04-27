@@ -1,6 +1,6 @@
-import './App.css';
 import Display from './components/Display/Display';
 import Dashboard from './components/Dashboard/Dashboard';
+import './App.css';
 
 function App() {
     return (
