@@ -17,6 +17,3 @@ const productsSlice = createSlice({
 });
 
 export default productsSlice.reducer;
-
-export const { addCash, increment, decrement, addTodo, removeLastTodo } =
-    productsSlice.actions;
