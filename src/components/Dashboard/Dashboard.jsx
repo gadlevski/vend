@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addCash } from '../../slices/money';
 
@@ -9,6 +9,7 @@ const Dashboard = () => {
     const [success, setSuccess] = useState(false);
     const [tencoin, setTencoin] = useState(null);
     const [fivecoin, setFivecoin] = useState(null);
+    const [message, setMessage] = useState('Insert money');
 
     const balance = useSelector((state) => state.money.balance);
     const products = useSelector((state) => state.products);
@@ -21,8 +22,44 @@ const Dashboard = () => {
 
     const addCashHandler = (e) => {
         if (e.key === 'Enter') {
-            dispatch(addCash(e.target.value));
+            const isValidate = [50, 100, 200, 500].some((item) => {
+                return item === +e.target.value;
+            });
+
+            if (isValidate) {
+                dispatch(addCash(e.target.value));
+            } else {
+                setMessage('Money is not accepted');
+            }
         }
+    };
+
+    useEffect(() => {
+        if (balance) {
+            setMessage(`Inserted money: ${balance} ₽`);
+        } else {
+            setMessage('Insert money');
+        }
+    }, [balance]);
+
+    const getDelivery = (price) => {
+        // расчет сдачи
+        const coinsCents = [1, 2, 5, 10];
+        const getChange = (amountInCents) => {
+            return coinsCents
+                .reverse()
+                .map((coin) => {
+                    let amountCoin = Math.floor(amountInCents / coin);
+                    amountInCents -= amountCoin * coin;
+                    return amountCoin;
+                })
+                .reverse();
+        };
+
+        let delivery = getChange(balance - price);
+        setTencoin(delivery[3]);
+        setFivecoin(delivery[2]);
+        setSuccess(true);
     };
 
     const selectProductHandler = (e) => {
@@ -36,24 +73,7 @@ const Dashboard = () => {
 
             e.target.value = '';
 
-            // расчет сдачи
-            const coinsCents = [1, 2, 5, 10];
-            const getChange = (amountInCents) => {
-                return coinsCents
-                    .reverse()
-                    .map((coin) => {
-                        let amountCoin = Math.floor(amountInCents / coin);
-                        amountInCents -= amountCoin * coin;
-                        return amountCoin;
-                    })
-                    .reverse();
-            };
-
-            let delivery = getChange(balance - price);
-            setTencoin(delivery[3]);
-            setFivecoin(delivery[2]);
-
-            setSuccess(true);
+            getDelivery(price);
         }
     };
 
@@ -61,7 +81,8 @@ const Dashboard = () => {
         <section className={styles.dashboard}>
             <form onSubmit={submitHandler}>
                 <label>
-                    {balance ? `Inserted money: ${balance} ₽` : 'Insert money'}
+                    {message}
+                    {/* {balance ? `Inserted money: ${balance} ₽` : 'Insert money'} */}
                 </label>
                 <input
                     onKeyDown={addCashHandler}
@@ -78,6 +99,7 @@ const Dashboard = () => {
             </form>
             <form onSubmit={submitHandler}>
                 <label>
+                    {/* {message} */}
                     {success ? 'Success' : balance ? 'Choose product' : '/'}
                 </label>
                 <input
@@ -91,8 +113,8 @@ const Dashboard = () => {
             </form>
             <div className={styles.output}>
                 <div className={styles.change_output}>
-                    {tencoin && <span>10₽: {tencoin} coins</span>}
-                    {fivecoin && <span>5₽: {fivecoin} coins</span>}
+                    {tencoin ? <span>10₽: {tencoin} coins</span> : null}
+                    {fivecoin ? <span>5₽: {fivecoin} coins</span> : null}
                 </div>
 
                 <div className={styles.product_block}>
