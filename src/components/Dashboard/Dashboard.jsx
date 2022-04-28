@@ -9,7 +9,8 @@ const Dashboard = () => {
     const [success, setSuccess] = useState(false);
     const [tencoin, setTencoin] = useState(null);
     const [fivecoin, setFivecoin] = useState(null);
-    const [message, setMessage] = useState('Insert money');
+    const [messageMoney, setMessageMoney] = useState('Insert money');
+    const [messageProduct, setMessageProduct] = useState('/');
 
     const balance = useSelector((state) => state.money.balance);
     const products = useSelector((state) => state.products);
@@ -22,28 +23,27 @@ const Dashboard = () => {
 
     const addCashHandler = (e) => {
         if (e.key === 'Enter') {
-            const isValidate = [50, 100, 200, 500].some((item) => {
+            const isValidateCash = [50, 100, 200, 500].some((item) => {
                 return item === +e.target.value;
             });
 
-            if (isValidate) {
+            if (isValidateCash) {
                 dispatch(addCash(e.target.value));
             } else {
-                setMessage('Money is not accepted');
+                setMessageMoney('Money is not accepted');
             }
         }
     };
 
     useEffect(() => {
         if (balance) {
-            setMessage(`Inserted money: ${balance} ₽`);
+            setMessageMoney(`Inserted money: ${balance} ₽`);
         } else {
-            setMessage('Insert money');
+            setMessageMoney('Insert money');
         }
     }, [balance]);
 
     const getDelivery = (price) => {
-        // расчет сдачи
         const coinsCents = [1, 2, 5, 10];
         const getChange = (amountInCents) => {
             return coinsCents
@@ -55,35 +55,55 @@ const Dashboard = () => {
                 })
                 .reverse();
         };
-
-        let delivery = getChange(balance - price);
-        setTencoin(delivery[3]);
-        setFivecoin(delivery[2]);
-        setSuccess(true);
+        if (balance > price) {
+            let delivery = getChange(balance - price);
+            setTencoin(delivery[3]);
+            setFivecoin(delivery[2]);
+            setSuccess(true);
+        } else {
+            setMessageProduct('Not enough money');
+        }
     };
 
     const selectProductHandler = (e) => {
         if (e.key === 'Enter') {
-            let product = products.find((product) => product.id === +e.target.value);
-            setSelectedProduct(product);
+            let productIdArray = products.map((product) => product.id);
 
-            let price = products.find(
-                (product) => product.id === +e.target.value
-            ).price;
+            const isValidateId = productIdArray.some((item) => {
+                return item === +e.target.value;
+            });
 
-            e.target.value = '';
+            if (isValidateId) {
+                let product = products.find(
+                    (product) => product.id === +e.target.value
+                );
+                setSelectedProduct(product);
 
-            getDelivery(price);
+                let price = products.find(
+                    (product) => product.id === +e.target.value
+                ).price;
+
+                e.target.value = '';
+
+                getDelivery(price);
+            } else {
+                setMessageProduct('Money is not accepted');
+            }
         }
     };
+
+    useEffect(() => {
+        if (success) {
+            setMessageProduct('Success');
+        } else {
+            setMessageProduct('Choose product');
+        }
+    }, [success]);
 
     return (
         <section className={styles.dashboard}>
             <form onSubmit={submitHandler}>
-                <label>
-                    {message}
-                    {/* {balance ? `Inserted money: ${balance} ₽` : 'Insert money'} */}
-                </label>
+                <label>{messageMoney}</label>
                 <input
                     onKeyDown={addCashHandler}
                     name='money'
@@ -97,11 +117,9 @@ const Dashboard = () => {
                     change in 1, 2, 5 and 10 ₽ coins.
                 </p>
             </form>
+
             <form onSubmit={submitHandler}>
-                <label>
-                    {/* {message} */}
-                    {success ? 'Success' : balance ? 'Choose product' : '/'}
-                </label>
+                <label>{messageProduct}</label>
                 <input
                     onKeyDown={selectProductHandler}
                     name='product'
@@ -111,6 +129,7 @@ const Dashboard = () => {
                     disabled={success}
                 ></input>
             </form>
+
             <div className={styles.output}>
                 <div className={styles.change_output}>
                     {tencoin ? <span>10₽: {tencoin} coins</span> : null}
