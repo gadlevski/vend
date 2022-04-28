@@ -100,6 +100,10 @@ const Dashboard = () => {
         }
     }, [success]);
 
+    const resetHandler = () => {
+        window.location.reload();
+    };
+
     return (
         <section className={styles.dashboard}>
             <form onSubmit={submitHandler}>
@@ -136,7 +140,7 @@ const Dashboard = () => {
                     {fivecoin ? <span>5₽: {fivecoin} coins</span> : null}
                 </div>
 
-                <div className={styles.product_block}>
+                <div className={styles.product_block} onClick={resetHandler}>
                     {success ? (
                         <>
                             <div className={styles.product}>
