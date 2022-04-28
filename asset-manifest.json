@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/vend/static/css/main.8a3ce38c.css",
+    "main.js": "/vend/static/js/main.c4038c5d.js",
+    "index.html": "/vend/index.html",
+    "main.8a3ce38c.css.map": "/vend/static/css/main.8a3ce38c.css.map",
+    "main.c4038c5d.js.map": "/vend/static/js/main.c4038c5d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8a3ce38c.css",
+    "static/js/main.c4038c5d.js"
+  ]
+}
